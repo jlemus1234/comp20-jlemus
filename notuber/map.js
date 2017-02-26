@@ -5,9 +5,12 @@ var userLong =  0;
 var user;
 var map;
 var marker;
+var username = "85sBoDu6";
+var infoWindow;
+var resp;
 
   function initMap() {
-    var user = new google.maps.LatLng(userLat, userLong);
+      user = new google.maps.LatLng(userLat, userLong);
       map = new google.maps.Map(document.getElementById('map'), {
       center: user,
       zoom: 20
@@ -24,7 +27,7 @@ var marker;
           userLong = position.coords.longitude
           user = new google.maps.LatLng(userLat, userLong);
 
-          var infoWindow = new google.maps.InfoWindow();
+          infoWindow = new google.maps.InfoWindow();
           infoWindow.setPosition(user);
           infoWindow.setContent('Location found.');
           map.panTo(user);
@@ -34,10 +37,24 @@ var marker;
                   position: user,
                   map: map,
                   icon: image,
-                  title: 'Hello World!'
+                  title: 'User'
            });
            userMarker.setMap(map);
            map.setCenter(user);
+
+           infoWindow = new google.maps.InfoWindow({
+             content: ('<h1> Username </h1>' + username)
+           })
+           infoWindow.open(map,userMarker);
+
+           userMarker.addListener('click', function() {
+             infoWindow.close();
+             infoWindow = new google.maps.InfoWindow({
+               content: ('<h1> Username </h1>' + username)
+             })
+             infoWindow.open(map, userMarker);
+           })
+
            requestData();
       }, function() {
         handleLocationError(true, infoWindow, map.getCenter());
@@ -61,7 +78,6 @@ function requestData() {
 //  console.log("Before request");
   var oReq = new XMLHttpRequest();
   var url = "https://defense-in-derpth.herokuapp.com/submit";
-  var username = "85sBoDu6";
   var params = "username=" + username + "&lat=" + userLat + "&lng=" + userLong;
   oReq.open("POST", url, true);
   oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -72,11 +88,11 @@ function requestData() {
 //    console.log(oReq.readyState);
 //    if (oReq.readyState === 4) {
 //      console.log(params);
-//      console.log(oReq.responseText);
-      var resp = oReq.responseText;
+      console.log(oReq.responseText);
+      resp = oReq.responseText;
       var respJSON = (JSON.parse(resp)).vehicles;
-      console.log(respJSON.length);
-      console.log(respJSON);
+//      console.log(respJSON.length);
+//      console.log(respJSON);
       for(var i = 0; i < respJSON.length; i++) {
         console.log(respJSON[i]);
         otherMarkers(respJSON[i]);
@@ -92,7 +108,17 @@ function otherMarkers(otherU){
           position: other,
           map: map,
           icon: image,
-          title: 'Targets'
+          title: 'Vehicles'
    });
    otherUMarker.setMap(map);
+
+   otherUMarker.addListener('click', function() {
+     infoWindow.close();
+     var dist = google.maps.geometry.spherical.computeDistanceBetween(user, other);
+     dist = (dist/1609.344);
+     infoWindow = new google.maps.InfoWindow({
+       content: ('<h1> Username </h1>' + otherU._id + '<h1> Distance </h1>' + dist)
+     })
+     infoWindow.open(map, otherUMarker);
+   })
 }
