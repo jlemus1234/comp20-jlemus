@@ -87,13 +87,12 @@ function requestData() {
 
 function otherMarkers(otherU){
   var image = "black_car.png"
+  var other = new google.maps.LatLng(otherU.lat, otherU.lng);
   var otherUMarker = new google.maps.Marker({
-          position: user,
+          position: other,
           map: map,
           icon: image,
           title: 'Targets'
    });
-   userMarker.setMap(map);
-   map.setCenter(user);
-   requestData();
+   otherUMarker.setMap(map);
 }
