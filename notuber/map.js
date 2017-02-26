@@ -1,26 +1,28 @@
 // google maps script
-  var pos = {
-    lat: 0,
-    long: 0
-  };
+
+var userLat = 0;
+var userLong =  0;
+var map;
 
   function initMap() {
-    var map = new google.maps.Map(document.getElementById('map'), {
-      center: {lat: -34.397, lng: 150.644},
+    var user = new google.maps.LatLng(userLat, userLong);
+      map = new google.maps.Map(document.getElementById('map'), {
+      center: user,
       zoom: 16
     });
-    var infoWindow = new google.maps.InfoWindow({map: map});
     // Try HTML5 geolocation.
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function(position) {
-        pos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
+          userLat = position.coords.latitude,
+          userLong = position.coords.longitude
 
-        infoWindow.setPosition(pos);
-        infoWindow.setContent('Location found.');
-        map.setCenter(pos);
+          var infoWindow = new google.maps.InfoWindow({map: map});
+          infoWindow.setPosition(user);
+          infoWindow.setContent('Location found.');
+          user = new google.maps.LatLng(userLat, userLong);
+          map.panTo(user);
+
+        map.setCenter(user);
       }, function() {
         handleLocationError(true, infoWindow, map.getCenter());
       });
@@ -28,7 +30,17 @@
       // Browser doesn't support Geolocation
       handleLocationError(false, infoWindow, map.getCenter());
     }
+
+//    var image = "person.png"
+//    var marker = new google.maps.Marker({
+//       position: user,
+//       map: map,
+//       title: 'Hello World!'
+//     });
+//     marker.setMap(map);
   }
+
+
 
   function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.setPosition(pos);
@@ -39,19 +51,21 @@
 
 
 
+
   console.log("Before request");;
   var oReq = new XMLHttpRequest();
   var url = "https://defense-in-derpth.herokuapp.com/submit";
   var username = "85sBoDu6";
-  var params = "username=" + username + "&lat=" + pos.lat + "&lng" + pos.long;
-  oReq.setRequestHeader = ("Content-type", "application/x-www-form-urlencoded");
+  var params = "username=" + username + "&lat=" + userLat + "&lng=" + userLong;
   oReq.open("POST", url, true);
+  oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   oReq.send(params);
   oReq.onreadystatechange = function (){
     if(oReq.readyState === XMLHttpRequest.DONE && oReq.status === 200)
     console.log("After request");
     console.log(oReq.readyState);
-    if (readyState==4) {
-
+    if (oReq.readyState === 4) {
+      console.log(params);
+      console.log(oReq.responseText);
     }
   }
