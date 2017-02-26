@@ -37,8 +37,8 @@ var marker;
                   title: 'Hello World!'
            });
            userMarker.setMap(map);
-
-//        map.setCenter(user);
+           map.setCenter(user);
+           requestData();
       }, function() {
         handleLocationError(true, infoWindow, map.getCenter());
       });
@@ -57,10 +57,8 @@ var marker;
                           'Error: Your browser doesn\'t support geolocation.');
   }
 
-
-
-/*
-  console.log("Before request");;
+function requestData() {
+//  console.log("Before request");
   var oReq = new XMLHttpRequest();
   var url = "https://defense-in-derpth.herokuapp.com/submit";
   var username = "85sBoDu6";
@@ -69,12 +67,33 @@ var marker;
   oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   oReq.send(params);
   oReq.onreadystatechange = function (){
-    if(oReq.readyState === XMLHttpRequest.DONE && oReq.status === 200)
-    console.log("After request");
-    console.log(oReq.readyState);
-    if (oReq.readyState === 4) {
-      console.log(params);
-      console.log(oReq.responseText);
+    if(oReq.readyState === XMLHttpRequest.DONE && oReq.status === 200){
+//    console.log("After request");
+//    console.log(oReq.readyState);
+//    if (oReq.readyState === 4) {
+//      console.log(params);
+//      console.log(oReq.responseText);
+      var resp = oReq.responseText;
+      var respJSON = (JSON.parse(resp)).vehicles;
+      console.log(respJSON.length);
+      console.log(respJSON);
+      for(var i = 0; i < respJSON.length; i++) {
+        console.log(respJSON[i]);
+        otherMarkers(respJSON[i]);
+      }
     }
   }
-*/
+}
+
+function otherMarkers(otherU){
+  var image = "black_car.png"
+  var otherUMarker = new google.maps.Marker({
+          position: user,
+          map: map,
+          icon: image,
+          title: 'Targets'
+   });
+   userMarker.setMap(map);
+   map.setCenter(user);
+   requestData();
+}
