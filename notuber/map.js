@@ -2,27 +2,43 @@
 
 var userLat = 0;
 var userLong =  0;
+var user;
 var map;
+var marker;
 
   function initMap() {
     var user = new google.maps.LatLng(userLat, userLong);
       map = new google.maps.Map(document.getElementById('map'), {
       center: user,
-      zoom: 16
+      zoom: 20
     });
+
+    getLocation();
+  }
+
+  function getLocation() {
     // Try HTML5 geolocation.
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function(position) {
           userLat = position.coords.latitude,
           userLong = position.coords.longitude
+          user = new google.maps.LatLng(userLat, userLong);
 
-          var infoWindow = new google.maps.InfoWindow({map: map});
+          var infoWindow = new google.maps.InfoWindow();
           infoWindow.setPosition(user);
           infoWindow.setContent('Location found.');
-          user = new google.maps.LatLng(userLat, userLong);
           map.panTo(user);
 
-        map.setCenter(user);
+          var image = "person.png"
+          var userMarker = new google.maps.Marker({
+                  position: user,
+                  map: map,
+                  icon: image,
+                  title: 'Hello World!'
+           });
+           userMarker.setMap(map);
+
+//        map.setCenter(user);
       }, function() {
         handleLocationError(true, infoWindow, map.getCenter());
       });
@@ -30,14 +46,6 @@ var map;
       // Browser doesn't support Geolocation
       handleLocationError(false, infoWindow, map.getCenter());
     }
-
-//    var image = "person.png"
-//    var marker = new google.maps.Marker({
-//       position: user,
-//       map: map,
-//       title: 'Hello World!'
-//     });
-//     marker.setMap(map);
   }
 
 
@@ -51,7 +59,7 @@ var map;
 
 
 
-
+/*
   console.log("Before request");;
   var oReq = new XMLHttpRequest();
   var url = "https://defense-in-derpth.herokuapp.com/submit";
@@ -69,3 +77,4 @@ var map;
       console.log(oReq.responseText);
     }
   }
+*/
