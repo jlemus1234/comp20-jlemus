@@ -54,8 +54,6 @@ var resp;
              })
              infoWindow.open(map, userMarker);
            })
-
-           requestData();
       }, function() {
         handleLocationError(true, infoWindow, map.getCenter());
       });
@@ -63,6 +61,7 @@ var resp;
       // Browser doesn't support Geolocation
       handleLocationError(false, infoWindow, map.getCenter());
     }
+    requestData();
   }
 
 
@@ -75,7 +74,6 @@ var resp;
   }
 
 function requestData() {
-//  console.log("Before request");
   var oReq = new XMLHttpRequest();
   var url = "https://defense-in-derpth.herokuapp.com/submit";
   var params = "username=" + username + "&lat=" + userLat + "&lng=" + userLong;
@@ -83,45 +81,49 @@ function requestData() {
   oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   oReq.send(params);
   oReq.onreadystatechange = function (){
-    if(oReq.readyState === XMLHttpRequest.DONE && oReq.status === 200){
+    if(oReq.readyState === 4 && oReq.status === 200){
 //    console.log("After request");
 //    console.log(oReq.readyState);
 //    if (oReq.readyState === 4) {
 //      console.log(params);
-      console.log(oReq.responseText);
+//      console.log(oReq.responseText);
       resp = oReq.responseText;
       resp = (JSON.parse(resp));
 
 if(resp.hasOwnProperty('passengers')){
   var respJSONPass = resp.passengers;
   for(var i = 0; i < respJSONPass.length; i++) {
-    console.log(respJSONPass[i]);
-    otherMarkers(respJSONPass[i]);
+//    console.log(respJSONPass[i]);
+    otherMarkers(respJSONPass[i], 'passenger');
     }
-
 }
 
 if(resp.hasOwnProperty('vehicles')){
       var respJSONVeh = resp.vehicles;
-//      console.log(respJSON.length);
-//      console.log(respJSON);
       for(var i = 0; i < respJSONVeh.length; i++) {
-        console.log(respJSON[i]);
-        otherMarkers(respJSON[i]);
+        otherMarkers(respJSON[i], 'vehicle');
       }
     }
   }
 }
 }
 
-function otherMarkers(otherU){
-  var image = "black_car.png"
+function otherMarkers(otherU, type){
+  var image;
+  var title;
+if (type === 'vehicle') {
+  image = "rsz_black_car.png";
+  title = "Driver";
+}else {
+  image = "rsz_person.png"
+  title = "Passenger";
+}
   var other = new google.maps.LatLng(otherU.lat, otherU.lng);
   var otherUMarker = new google.maps.Marker({
           position: other,
           map: map,
           icon: image,
-          title: 'Vehicles'
+          title: title
    });
    otherUMarker.setMap(map);
 
@@ -131,7 +133,7 @@ function otherMarkers(otherU){
      dist = (dist/1609.344);
      infoWindow = new google.maps.InfoWindow({
        content: ('<h1> Username </h1>' + otherU.username + '<h1> Distance </h1>' + dist)
-     })
+     });
      infoWindow.open(map, otherUMarker);
    })
 }
