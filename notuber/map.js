@@ -32,7 +32,7 @@ var resp;
           infoWindow.setContent('Location found.');
           map.panTo(user);
 
-          var image = "person.png"
+          var image = "rsz_flag.png";
           var userMarker = new google.maps.Marker({
                   position: user,
                   map: map,
@@ -44,7 +44,7 @@ var resp;
 
            infoWindow = new google.maps.InfoWindow({
              content: ('<h1> Username </h1>' + username)
-           })
+           });
            infoWindow.open(map,userMarker);
 
            userMarker.addListener('click', function() {
@@ -90,15 +90,28 @@ function requestData() {
 //      console.log(params);
       console.log(oReq.responseText);
       resp = oReq.responseText;
-      var respJSON = (JSON.parse(resp)).vehicles;
+      resp = (JSON.parse(resp));
+
+if(resp.hasOwnProperty('passengers')){
+  var respJSONPass = resp.passengers;
+  for(var i = 0; i < respJSONPass.length; i++) {
+    console.log(respJSONPass[i]);
+    otherMarkers(respJSONPass[i]);
+    }
+
+}
+
+if(resp.hasOwnProperty('vehicles')){
+      var respJSONVeh = resp.vehicles;
 //      console.log(respJSON.length);
 //      console.log(respJSON);
-      for(var i = 0; i < respJSON.length; i++) {
+      for(var i = 0; i < respJSONVeh.length; i++) {
         console.log(respJSON[i]);
         otherMarkers(respJSON[i]);
       }
     }
   }
+}
 }
 
 function otherMarkers(otherU){
@@ -117,7 +130,7 @@ function otherMarkers(otherU){
      var dist = google.maps.geometry.spherical.computeDistanceBetween(user, other);
      dist = (dist/1609.344);
      infoWindow = new google.maps.InfoWindow({
-       content: ('<h1> Username </h1>' + otherU._id + '<h1> Distance </h1>' + dist)
+       content: ('<h1> Username </h1>' + otherU.username + '<h1> Distance </h1>' + dist)
      })
      infoWindow.open(map, otherUMarker);
    })

@@ -1,5 +1,9 @@
-Identify what aspects of the work have been correctly implemented and what have not.
+A website that makes use of the google maps API and geolocation to display the
+users location. It also makes an XMLHTTPRequest to get data on nearby vehicles
+and drivers, and parses the data using JSON. The vehicles and drivers are
+displayed on the map.
 
-Identify anyone with whom you have collaborated or discussed the assignment.
+This assignment was completed independently.
 
-Say approximately how many hours you have spent completing the assignment.
+Time spent:
+Approximately 5 hours
