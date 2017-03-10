@@ -82,18 +82,12 @@ function requestData() {
   oReq.send(params);
   oReq.onreadystatechange = function (){
     if(oReq.readyState === 4 && oReq.status === 200){
-//    console.log("After request");
-//    console.log(oReq.readyState);
-//    if (oReq.readyState === 4) {
-//      console.log(params);
-//      console.log(oReq.responseText);
       resp = oReq.responseText;
       resp = (JSON.parse(resp));
 
 if(resp.hasOwnProperty('passengers')){
   var respJSONPass = resp.passengers;
   for(var i = 0; i < respJSONPass.length; i++) {
-//    console.log(respJSONPass[i]);
     otherMarkers(respJSONPass[i], 'passenger');
     }
 }
