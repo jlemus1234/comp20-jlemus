@@ -1,7 +1,7 @@
 // google maps script
 
 var userLat = 0;
-var userLong =  0;
+var userLong = 0;
 var user;
 var map;
 var marker;
@@ -23,9 +23,11 @@ var resp;
     // Try HTML5 geolocation.
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function(position) {
-          userLat = position.coords.latitude,
-          userLong = position.coords.longitude
+          userLat = position.coords.latitude;
+          userLong = position.coords.longitude;
           user = new google.maps.LatLng(userLat, userLong);
+      //    console.log(userLat);
+    //      console.log(userLong);
 
           infoWindow = new google.maps.InfoWindow();
           infoWindow.setPosition(user);
@@ -54,6 +56,7 @@ var resp;
              })
              infoWindow.open(map, userMarker);
            })
+           requestData();
       }, function() {
         handleLocationError(true, infoWindow, map.getCenter());
       });
@@ -61,7 +64,7 @@ var resp;
       // Browser doesn't support Geolocation
       handleLocationError(false, infoWindow, map.getCenter());
     }
-    requestData();
+//    requestData();
   }
 
 
@@ -75,8 +78,11 @@ var resp;
 
 function requestData() {
   var oReq = new XMLHttpRequest();
-  var url = "https://defense-in-derpth.herokuapp.com/submit";
+  //var url = "https://defense-in-derpth.herokuapp.com/submit";
+  var url = "https://dry-journey-64231.herokuapp.com/submit";
   var params = "username=" + username + "&lat=" + userLat + "&lng=" + userLong;
+//  console.log(userLat);
+//  console.log(userLong);
   oReq.open("POST", url, true);
   oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   oReq.send(params);
@@ -84,6 +90,7 @@ function requestData() {
     if(oReq.readyState === 4 && oReq.status === 200){
       resp = oReq.responseText;
       resp = (JSON.parse(resp));
+//      console.log(resp);
 
 if(resp.hasOwnProperty('passengers')){
   var respJSONPass = resp.passengers;
@@ -95,7 +102,7 @@ if(resp.hasOwnProperty('passengers')){
 if(resp.hasOwnProperty('vehicles')){
       var respJSONVeh = resp.vehicles;
       for(var i = 0; i < respJSONVeh.length; i++) {
-        otherMarkers(respJSON[i], 'vehicle');
+        otherMarkers(respJSONVeh[i], 'vehicle');
       }
     }
   }
