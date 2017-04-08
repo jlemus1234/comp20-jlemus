@@ -26,8 +26,7 @@ var resp;
           userLat = position.coords.latitude;
           userLong = position.coords.longitude;
           user = new google.maps.LatLng(userLat, userLong);
-      //    console.log(userLat);
-    //      console.log(userLong);
+
 
           infoWindow = new google.maps.InfoWindow();
           infoWindow.setPosition(user);
@@ -64,7 +63,6 @@ var resp;
       // Browser doesn't support Geolocation
       handleLocationError(false, infoWindow, map.getCenter());
     }
-//    requestData();
   }
 
 
@@ -81,8 +79,7 @@ function requestData() {
   //var url = "https://defense-in-derpth.herokuapp.com/submit";
   var url = "https://dry-journey-64231.herokuapp.com/submit";
   var params = "username=" + username + "&lat=" + userLat + "&lng=" + userLong;
-//  console.log(userLat);
-//  console.log(userLong);
+
   oReq.open("POST", url, true);
   oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   oReq.send(params);
@@ -90,7 +87,6 @@ function requestData() {
     if(oReq.readyState === 4 && oReq.status === 200){
       resp = oReq.responseText;
       resp = (JSON.parse(resp));
-//      console.log(resp);
 
 if(resp.hasOwnProperty('passengers')){
   var respJSONPass = resp.passengers;
