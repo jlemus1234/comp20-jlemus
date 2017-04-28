@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Security</title>
+    <link href = "main.css" rel = "stylesheet"/>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <h1>Introduction</h1>
+      <p>The product was a website that displayed map of available customers who were looking for rides, or drivers who were looking for passengers.
+        The website made use of geolocation and an associated database in order to store and retrieve all the required information. </p>
+    <h1>Methodology</h1>
+      <p> Curl was the primary tool used. Each component of the program was tested to ensure that they were working correctly, and instances of incorrect operation
+      were noted. Specific points of interest, such as database requests requiring user input, were focused on. These points were tested with a variety of different inputs
+      that would not normally be expected, such as scripts and other fragments of code. Incorrect data type submissions were also checked. </p>
+    <h1>Abstract of Findings</h1>
+      <p> Several different issues were found, with ranging levels of severity. Some of the problems encountered with the program included basic functionality.
+      The vehicle.json page did not function correctly; instead of returning vehicles, it could only return specific passengers. The database would also return multiple records
+      for a single user; this could create problems within the client's map. A second set of vulnerabilities permitted the program to run outside scripts and code.
+      The lack of input validation allowed users to exploit the lenient requirements of the username field when making a request to the database. The managing of user credentials
+    was also problematic; the username used to access necessary data was hardcoded into the HTML, allowing anyone to access it. Additionally, the database lacked any password protection. </p>
+    <h1>Issues Found</h1>
+      <ul>
+        <li>
+          <h2>XSS vulnerability</h2>
+          <h3>Issue </h3>
+          Javascript from outside sources can be made to run on some pages of the website.
+          <h3>Location </h3>
+          The Passenger page of the website, the map shown to clients.
+          <h3> Severity </h3>
+          <p> High </p>
+          <p> The outside javascript is able to control the Passengers page, potentially putting any visitors at risk. As the page displays user
+          credentials, the vulnerability should be given some priority. </p>
+          <p> The records with a script as the username are handled by the program as vehicles, and are shown without a name on the map shown to clients.
+            This could put users at risk, as they are unable to identify the individual through the map. </p>
+          <h3>Description </h3>
+          <p>The username field of the records stored in the database can be exploited to store scripts that are later executed when the the records are loaded into a web page. </p>
+          <img src="img/flaw3_JSInjection.PNG">
+          <h3>Proof </h3>
+          <img src = "img/flaw3_JSInjectionPassenger.PNG">
+          <p>An outside script causing an alert to appear on the passenger page. </p>
+          <img src = "img/flaw3_map.PNG">
+          <p>The compromised records appearing on the map.</p>
+          <h3>Resolution </h3>
+          <p> Validate the user input before storing it in the database. </p>
+          <p> var validator = require('validator'); </p>
+          <p> username = username.replace(/[^\w\s]/gi, ''); </p>
+        </li>
+        <li>
+          <h2>Duplicate database entries</h2>
+          <h3>Issue </h3>
+          <p>The database contains and returns multiple instances of the same user.</p>
+          <h3>Location </h3>
+            <p>Passenger page, the map shown to clients.</p>
+          <h3> Severity </h3>
+            <p> High </p>
+            <p> The integrity of the database is compromised because users can appear multiple times. </p>
+            <p> It is a privacy concern because every interaction with a user is being logged. </p>
+          <h3>Description </h3>
+          <p> A new record is kept and stored in the database every time that a POST request is made to the database.
+          This allows for the same user to appear in multiple locations at once, and violates the integrity of the data.</p>
+          <h3>Proof </h3>
+          <img src = "img/flaw2SamePass.PNG">
+          <p> Multiple instances of the same users being returned by the database </p>
+          <img src = "img/flaw2SamePassSite.PNG">
+          <p> The Passenger page showing multiple instances of the same user repeatedly. </p>
+          <h3>Resolution </h3>
+          <p> Use functions like update() with upsert enabled instead of inserting every time a request is made. <p>
+        </li>
+        <li>
+          <h2>HTML injection</h2>
+          <h3>Issue </h3>
+          <p>HTML can be injected into the passenger page </p>
+          <h3>Location </h3>
+          Passengers page
+          <h3> Severity </h3>
+          <p>High </p>
+          <p>The page can be modified to load offensive content, redirect users to compromised sites,
+            and potentially steal loaded user information. </p>
+          <p>Passenger page </p>
+          <h3>Description </h3>
+          <p>It is possible to inject HTML code into the passenger page by exploiting the user input
+            provided in the username field. </p>
+          <img src = "img/flaw4_cause.PNG">
+          <h3>Proof </h3>
+          <img src = "img/flaw4_.PNG">
+          <p>An image sourced from a different website being shown as a username. </p>
+          <h3>Resolution </h3>
+          <p>Validate the user input before storing it in the database. </p>
+          <p>var validator = require('validator'); </p>
+          <p>username = username.replace(/[^\w\s]/gi, ''); </p>
+        </li>
+        <li>
+          <h2>Incorrect database access </h2>
+          <h3>Issue </h3>
+          <p>The vehicle.json page is implemented incorrectly. </p>
+          <h3>Location </h3>
+          <p>MongoDB pages on Heroku</p>
+          <h3>Severity </h3>
+          <p>Medium <p>
+          <p>The website is returning the wrong information. It would require knowledge of a user's
+            username, and an assumption about the underlying problem in order to exploit the mistake.
+            The passenger data is made available by the same program elsewhere regardless.
+          <p>vehicle.json page </p>
+          <h3>Description </h3>
+          <p>The vehicle.json page is not able to return any vehicles. It has been directed to
+            search in the passengers collection of the database. This would have broken any component
+            that would have depended on the page to retrieve vehicle data.
+          </p>
+          <h3>Proof </h3>
+          <img src = "img/flaw5_vehicleGettingPassengers.PNG">
+          <p> The portion of code directing the site to query the wrong collection of the database. </p>
+          <img src = "img/flaw5_jlem.PNG">
+          <p> A passenger's data being returned by the page. </p>
+          <img src = "img/flaw5_JANET.PNG">
+          <p> The record for a vehicle that's been previously entered cannot be found. </p>
+          <h3>Resolution </h3>
+          <p>Modify the program to use the vehicles collection instead of passengers </p>
+          <p>db.collection("vehicles"...)</p>
+        </li>
+        <li>
+          <h2>Hardcoded credentials</h2>
+          <h3>Issue </h3>
+          <p> Usernames are hardcoded into the program. <p>
+          <h3>Location </h3>
+          index.html code for the map component of the program.
+          <h3> Severity </h3>
+          <p> High </p>
+          <p> It is possible to steal a user's credentials from the website. </p>
+          <h3>Description </h3>
+          <p> User credentials, like the username, are hardcoded into the program. Anyone
+          that would visit the website would have access to that user's information. </p>
+          <h3>Proof </h3>
+          <img src = "img/flaw6HardCoded.PNG">
+          <p> A hardcoded username in the program's code. <p>
+          <h3>Resolution </h3>
+          <p> Ask for a username on the website instead of hardcoding it, or add a password </p>
+        </li>
+        <li>
+          <h2>MongoDB injection attack</h2>
+          <h3>Issue</h3>
+          <p> It is possible to retrieve data from the database in a way that wasn't intended. </p>
+          <h3>Location</h3>
+          vehicle.json page
+          <h3> Severity </h3>
+          <p> High </p>
+          <p> Data for users intended to be kept private can possibly be leaked. </p>
+          <h3>Description</h3>
+          The vehicle.json page allows for unintended retrieval of user information from the database. By modifying
+          the entered query to include mongodb commands, the database may return the information of a different user.
+          <h3>Proof</h3>
+          <img src="img/flaw8_website.PNG">
+          <p> The information for the user "testin" is returned by a query instead of empty brackets. </p>
+          <h3>Resolution</h3>
+          <p> Validation must be added to the vehicle.json component of the program. Characters like the dollar sign need to
+            targeted specifically. </p>
+        </li>
+        <li>
+          <h2>Unprotected database</h2>
+          <h3>Issue</h3>
+          <p> The database does not ask for any credentials when accessing it. </p>
+          <h3>Location</h3>
+          MongoDB pages on Heroku
+          <h3>Severity </h3>
+          <p>High</p>
+          <p>Anyone can access the database and submit data to it, which can make it unreliable and dangerous. </p>
+          <h3>Description</h3>
+          <p> Posting data to the server doesn't require any kind of authentication and it is open to receiving input
+          from any source. </p>
+          <h3>Proof</h3>
+          <img src = "img/flaw.PNG">
+          <p> Accessing the database only requires knowing the URL. </p>
+          <h3>Resolution</h3>
+          <p> Add a password to the database </p>
+        </li>
+      </ul>
+    <h1>Conclusion</h1>
+    <p> In the future, I would reccomend being particularly careful when processing input received from users. Special characters that could be used
+    to run scripts, commands, or create tags should be removed before the information is stored. User credentials should not be hard coded into a web
+    page either, as they would be visible to the pulic. The program could have benefitted from some more debugging to ensure that the right data was being returned
+    when the website was used as intended. </p>
+  </body>
+  <h2>References </h2>
+  <a href="https://gist.github.com/mchow01/49f8979829f1c488d922">https://gist.github.com/mchow01/49f8979829f1c488d922</a>
+</html>
